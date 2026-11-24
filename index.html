@@ -1,1 +1,847 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบสำรวจการเข้าร่วมกิจกรรม | King Power Mahanakhon</title>
 
+  <!-- Google Fonts: Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3 CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    :root {
+      --primary-coral: #FF6B6B;
+      --secondary-teal: #4ECDC4;
+      --accent-yellow: #FFD166;
+      --vivid-purple: #6C5CE7;
+    }
+
+    body {
+      font-family: 'Prompt', sans-serif;
+      background: linear-gradient(135deg, #FFF5F5 0%, #F0F9FF 50%, #F5F3FF 100%);
+      color: #2D3748;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Hero Carousel Section */
+    .hero-wrapper {
+      position: relative;
+      border-radius: 0 0 2.5rem 2.5rem;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(108, 92, 231, 0.18);
+    }
+
+    .carousel-item {
+      height: 440px;
+      position: relative;
+    }
+
+    .carousel-svg-bg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.25) 60%, rgba(15, 23, 42, 0.15) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2.5rem 1.5rem 3.5rem;
+      color: #fff;
+      text-align: center;
+    }
+
+    .badge-vibrant {
+      background: linear-gradient(90deg, var(--primary-coral), #FF8E53);
+      color: white;
+      padding: 0.45rem 1.1rem;
+      border-radius: 50px;
+      font-weight: 500;
+      font-size: 0.85rem;
+      display: inline-block;
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    }
+
+    .btn-cta-hero {
+      background: linear-gradient(90deg, #FFD166, #FF9F1C);
+      color: #1A202C;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      padding: 0.7rem 1.8rem;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 6px 20px rgba(255, 209, 102, 0.45);
+    }
+
+    .btn-cta-hero:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(255, 209, 102, 0.65);
+      color: #1A202C;
+    }
+
+    /* Main Survey Card */
+    .survey-container {
+      margin-top: -2.2rem;
+      position: relative;
+      z-index: 10;
+      padding-bottom: 3rem;
+      flex: 1;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border-radius: 1.75rem;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.07);
+      padding: 2rem;
+    }
+
+    .section-title {
+      font-weight: 700;
+      color: var(--vivid-purple);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 1.25rem;
+    }
+
+    .section-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--vivid-purple), #A29BFE);
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    /* Custom Radio Cards */
+    .choice-card {
+      cursor: pointer;
+      border: 2px solid #E2E8F0;
+      border-radius: 1.15rem;
+      padding: 1.15rem;
+      transition: all 0.25s ease;
+      background: #FFFFFF;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .choice-card:hover {
+      border-color: #CBD5E1;
+      transform: translateY(-2px);
+    }
+
+    .btn-check:checked + .choice-card.going-card {
+      border-color: #10B981;
+      background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.18);
+    }
+
+    .btn-check:checked + .choice-card.not-going-card {
+      border-color: #F43F5E;
+      background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%);
+      box-shadow: 0 8px 20px rgba(244, 63, 94, 0.18);
+    }
+
+    .btn-check:checked + .choice-card.activity-card {
+      border-color: var(--vivid-purple);
+      background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
+      box-shadow: 0 8px 20px rgba(108, 92, 231, 0.18);
+    }
+
+    .choice-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    /* Companion Card */
+    .companion-card {
+      background: linear-gradient(135deg, #F8FAFC 0%, #F0FDFA 100%);
+      border: 2px solid #99F6E4;
+      border-radius: 1.25rem;
+      padding: 1.25rem;
+      animation: fadeSlideIn 0.35s ease forwards;
+    }
+
+    .companion-badge {
+      background: linear-gradient(90deg, #0D9488, #14B8A6);
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.3rem 0.9rem;
+      border-radius: 50px;
+      display: inline-block;
+    }
+
+    /* Submit Button */
+    .btn-submit-vibrant {
+      background: linear-gradient(90deg, #FF6B6B 0%, #6C5CE7 100%);
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      padding: 0.95rem 2rem;
+      border-radius: 50px;
+      box-shadow: 0 10px 25px rgba(108, 92, 231, 0.35);
+      transition: all 0.3s ease;
+    }
+
+    .btn-submit-vibrant:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(255, 107, 107, 0.45);
+      color: white;
+    }
+
+    .form-control, .form-select {
+      border-radius: 0.85rem;
+      padding: 0.7rem 1rem;
+      border: 1.5px solid #CBD5E1;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--vivid-purple);
+      box-shadow: 0 0 0 0.25rem rgba(108, 92, 231, 0.15);
+    }
+
+    /* Footer Styling */
+    .site-footer {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(203, 213, 225, 0.6);
+      padding: 1.5rem 0;
+      margin-top: auto;
+    }
+
+    .btn-admin-footer {
+      background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
+      color: var(--vivid-purple);
+      border: 1.5px solid #DDD6FE;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.45rem 1.15rem;
+      border-radius: 50px;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-admin-footer:hover {
+      background: var(--vivid-purple);
+      color: #FFFFFF;
+      border-color: var(--vivid-purple);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(108, 92, 231, 0.25);
+    }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-section {
+      animation: fadeSlideIn 0.35s ease forwards;
+    }
+
+    @media (max-width: 576px) {
+      .carousel-item { height: 390px; }
+      .glass-card { padding: 1.35rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Landing Page: Auto-sliding Carousel จำลองตึกมหานคร 3 รูป -->
+  <header class="hero-wrapper">
+    <div id="mahanakhonCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3500">
+      <div class="carousel-indicators mb-4">
+        <button type="button" data-bs-target="#mahanakhonCarousel" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#mahanakhonCarousel" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#mahanakhonCarousel" data-bs-slide-to="2"></button>
+      </div>
+
+      <div class="carousel-inner">
+        <!-- รูปจำลองที่ 1: ตึกมหานครยามเช้าฟ้าสดใส -->
+        <div class="carousel-item active">
+          <svg class="carousel-svg-bg" viewBox="0 0 1200 450" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="skyDay" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00B4DB"/>
+                <stop offset="50%" stop-color="#0083B0"/>
+                <stop offset="100%" stop-color="#4ECDC4"/>
+              </linearGradient>
+              <linearGradient id="towerGlass1" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#E0F2FE"/>
+                <stop offset="50%" stop-color="#7DD3FC"/>
+                <stop offset="100%" stop-color="#0284C7"/>
+              </linearGradient>
+            </defs>
+            <rect width="1200" height="450" fill="url(#skyDay)"/>
+            <circle cx="220" cy="110" r="45" fill="rgba(255,255,255,0.35)"/>
+            <circle cx="265" cy="105" r="55" fill="rgba(255,255,255,0.4)"/>
+            <circle cx="315" cy="115" r="40" fill="rgba(255,255,255,0.35)"/>
+            <circle cx="920" cy="95" r="50" fill="rgba(255,255,255,0.3)"/>
+            <circle cx="970" cy="90" r="60" fill="rgba(255,255,255,0.35)"/>
+            <rect x="360" y="290" width="75" height="160" fill="#0369A1" opacity="0.6"/>
+            <rect x="445" y="260" width="65" height="190" fill="#075985" opacity="0.7"/>
+            <rect x="690" y="275" width="80" height="175" fill="#0369A1" opacity="0.65"/>
+            <rect x="780" y="310" width="70" height="140" fill="#0284C7" opacity="0.55"/>
+            <rect x="545" y="45" width="110" height="405" fill="url(#towerGlass1)"/>
+            <rect x="535" y="65" width="20" height="35" fill="#38BDF8"/>
+            <rect x="645" y="95" width="22" height="40" fill="#0284C7"/>
+            <rect x="545" y="120" width="35" height="28" fill="#0096C7"/>
+            <rect x="570" y="148" width="42" height="25" fill="#0096C7"/>
+            <rect x="605" y="173" width="50" height="30" fill="#0284C7"/>
+            <rect x="585" y="203" width="45" height="26" fill="#0096C7"/>
+            <rect x="545" y="229" width="48" height="32" fill="#0096C7"/>
+            <rect x="565" y="261" width="38" height="24" fill="#0284C7"/>
+            <rect x="615" y="285" width="40" height="30" fill="#0096C7"/>
+            <rect x="555" y="32" width="90" height="13" fill="#FFD166"/>
+          </svg>
+          <div class="hero-overlay">
+            <div class="container">
+              <span class="badge-vibrant mb-2"><i class="bi bi-stars me-1"></i> SPECIAL EVENT 2026</span>
+              <h1 class="fw-bold display-6 mb-2">สัมผัสประสบการณ์เหนือระดับ ณ ตึกมหานคร</h1>
+              <p class="mb-3 text-light opacity-90">ชมทัศนียภาพกรุงเทพฯ แบบ 360 องศา พร้อมมื้ออาหารสุดพิเศษสำหรับคุณและครอบครัว</p>
+              <a href="#surveyFormSection" class="btn btn-cta-hero">
+                <i class="bi bi-pencil-square me-1"></i> เริ่มทำแบบสำรวจ
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- รูปจำลองที่ 2: ตึกมหานครยามเย็น Golden Sunset -->
+        <div class="carousel-item">
+          <svg class="carousel-svg-bg" viewBox="0 0 1200 450" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="skySunset" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#6C5CE7"/>
+                <stop offset="45%" stop-color="#FF6B6B"/>
+                <stop offset="100%" stop-color="#FFD166"/>
+              </linearGradient>
+              <linearGradient id="towerSunset" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#FDE68A"/>
+                <stop offset="50%" stop-color="#F59E0B"/>
+                <stop offset="100%" stop-color="#B45309"/>
+              </linearGradient>
+            </defs>
+            <rect width="1200" height="450" fill="url(#skySunset)"/>
+            <circle cx="820" cy="240" r="95" fill="#FEF08A" opacity="0.65"/>
+            <circle cx="820" cy="240" r="65" fill="#FFFFFF" opacity="0.75"/>
+            <rect x="340" y="280" width="85" height="170" fill="#4C1D95" opacity="0.65"/>
+            <rect x="435" y="250" width="75" height="200" fill="#5B21B6" opacity="0.75"/>
+            <rect x="685" y="265" width="85" height="185" fill="#4C1D95" opacity="0.7"/>
+            <rect x="780" y="300" width="90" height="150" fill="#6D28D9" opacity="0.6"/>
+            <rect x="545" y="45" width="110" height="405" fill="url(#towerSunset)"/>
+            <rect x="545" y="120" width="35" height="28" fill="#DC2626" opacity="0.75"/>
+            <rect x="570" y="148" width="42" height="25" fill="#9A3412" opacity="0.8"/>
+            <rect x="605" y="173" width="50" height="30" fill="#DC2626" opacity="0.75"/>
+            <rect x="585" y="203" width="45" height="26" fill="#9A3412" opacity="0.8"/>
+            <rect x="545" y="229" width="48" height="32" fill="#DC2626" opacity="0.75"/>
+            <rect x="615" y="285" width="40" height="30" fill="#9A3412" opacity="0.8"/>
+            <rect x="555" y="32" width="90" height="13" fill="#FFFBEB"/>
+          </svg>
+          <div class="hero-overlay">
+            <div class="container">
+              <span class="badge-vibrant mb-2"><i class="bi bi-sun-fill me-1"></i> MAHANAKHON SKYWALK</span>
+              <h1 class="fw-bold display-6 mb-2">ดื่มด่ำบรรยากาศพระอาทิตย์ตกบนจุดสูงสุด</h1>
+              <p class="mb-3 text-light opacity-90">ท้าทายความสูงบนพื้นกระจกลอยฟ้า (Glass Tray) ที่ความสูง 314 เมตร</p>
+              <a href="#surveyFormSection" class="btn btn-cta-hero">
+                <i class="bi bi-check2-circle me-1"></i> ลงทะเบียนเข้าร่วมงาน
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- รูปจำลองที่ 3: ตึกมหานครยามค่ำคืน Neon Night -->
+        <div class="carousel-item">
+          <svg class="carousel-svg-bg" viewBox="0 0 1200 450" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="skyNight" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#0F172A"/>
+                <stop offset="50%" stop-color="#311042"/>
+                <stop offset="100%" stop-color="#1E1B4B"/>
+              </linearGradient>
+              <linearGradient id="towerNeon" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#38BDF8"/>
+                <stop offset="50%" stop-color="#818CF8"/>
+                <stop offset="100%" stop-color="#EC4899"/>
+              </linearGradient>
+            </defs>
+            <rect width="1200" height="450" fill="url(#skyNight)"/>
+            <circle cx="180" cy="80" r="3" fill="#FFD166"/>
+            <circle cx="320" cy="130" r="2.5" fill="#FFFFFF"/>
+            <circle cx="430" cy="65" r="3.5" fill="#4ECDC4"/>
+            <circle cx="770" cy="75" r="3" fill="#FFD166"/>
+            <circle cx="890" cy="140" r="3" fill="#FF6B6B"/>
+            <circle cx="1020" cy="90" r="2.5" fill="#FFFFFF"/>
+            <rect x="350" y="285" width="80" height="165" fill="#1E293B"/>
+            <rect x="440" y="255" width="70" height="195" fill="#0F172A"/>
+            <rect x="690" y="270" width="80" height="180" fill="#1E293B"/>
+            <rect x="780" y="305" width="75" height="145" fill="#0F172A"/>
+            <rect x="545" y="45" width="110" height="405" fill="url(#towerNeon)"/>
+            <rect x="545" y="120" width="35" height="28" fill="#1E1B4B"/>
+            <rect x="570" y="148" width="42" height="25" fill="#F472B6"/>
+            <rect x="605" y="173" width="50" height="30" fill="#1E1B4B"/>
+            <rect x="585" y="203" width="45" height="26" fill="#22D3EE"/>
+            <rect x="545" y="229" width="48" height="32" fill="#1E1B4B"/>
+            <rect x="615" y="285" width="40" height="30" fill="#FACC15"/>
+            <rect x="555" y="32" width="90" height="13" fill="#38BDF8"/>
+          </svg>
+          <div class="hero-overlay">
+            <div class="container">
+              <span class="badge-vibrant mb-2"><i class="bi bi-cup-hot-fill me-1"></i> LUXURY DINING & NIGHT VIEW</span>
+              <h1 class="fw-bold display-6 mb-2">ดินเนอร์สุดหรูท่ามกลางแสงสีแห่งมหานคร</h1>
+              <p class="mb-3 text-light opacity-90">พาครอบครัวและคนพิเศษมาร่วมสร้างความทรงจำสุดประทับใจไปด้วยกัน</p>
+              <a href="#surveyFormSection" class="btn btn-cta-hero">
+                <i class="bi bi-arrow-down-circle me-1"></i> ตอบแบบสำรวจด้านล่าง
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="carousel-control-prev" type="button" data-bs-target="#mahanakhonCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#mahanakhonCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Survey Section -->
+  <main class="container survey-container" id="surveyFormSection">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10">
+        <div class="glass-card">
+          <div class="text-center mb-4">
+            <h2 class="fw-bold text-dark mb-1">แบบสำรวจการเข้าร่วมกิจกรรม</h2>
+            <p class="text-muted mb-0">กรุณากรอกข้อมูลและเลือกความประสงค์ในการเข้าร่วมงาน</p>
+          </div>
+
+          <form id="surveyForm" novalidate>
+            <!-- ส่วนที่ 1: ข้อมูลผู้ตอบแบบสำรวจ -->
+            <div class="mb-4">
+              <div class="section-title mb-3">
+                <span class="section-icon"><i class="bi bi-person-badge"></i></span>
+                <span>ข้อมูลผู้ลงทะเบียน</span>
+              </div>
+              <div class="row g-3">
+                <div class="col-md-7">
+                  <label for="fullName" class="form-label fw-semibold">ชื่อ-นามสกุล <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="fullName" placeholder="เช่น นายสมชาย ใจดี" required>
+                </div>
+                <div class="col-md-5">
+                  <label for="phone" class="form-label fw-semibold">เบอร์โทรศัพท์ติดต่อ</label>
+                  <input type="tel" class="form-control" id="phone" placeholder="เช่น 081-234-5678">
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-4 opacity-25">
+
+            <!-- ส่วนที่ 2: เลือกการเข้าร่วมงาน (ไป / ไม่ไป) -->
+            <div class="mb-4">
+              <div class="section-title mb-3">
+                <span class="section-icon" style="background: linear-gradient(135deg, #FF6B6B, #FF8E53);">
+                  <i class="bi bi-calendar-check"></i>
+                </span>
+                <span>ท่านประสงค์จะเข้าร่วมกิจกรรมหรือไม่? <span class="text-danger">*</span></span>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-sm-6">
+                  <input type="radio" class="btn-check" name="attendance" id="optGoing" value="ไป" required>
+                  <label class="choice-card going-card" for="optGoing">
+                    <div class="choice-icon bg-success bg-opacity-10 text-success">
+                      <i class="bi bi-emoji-smile-fill"></i>
+                    </div>
+                    <div>
+                      <div class="fw-bold fs-5 text-success">ไป (เข้าร่วมงาน)</div>
+                      <small class="text-muted">เลือกกิจกรรมและระบุผู้ติดตามได้สูงสุด 5 คน</small>
+                    </div>
+                  </label>
+                </div>
+
+                <div class="col-sm-6">
+                  <input type="radio" class="btn-check" name="attendance" id="optNotGoing" value="ไม่ไป" required>
+                  <label class="choice-card not-going-card" for="optNotGoing">
+                    <div class="choice-icon bg-danger bg-opacity-10 text-danger">
+                      <i class="bi bi-emoji-frown-fill"></i>
+                    </div>
+                    <div>
+                      <div class="fw-bold fs-5 text-danger">ไม่ไป</div>
+                      <small class="text-muted">ไม่สะดวกเข้าร่วม สามารถกดส่งข้อมูลได้ทันที</small>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- เงื่อนไขกรณีเลือก "ไม่ไป" -->
+            <div id="notGoingNotice" class="alert alert-light border border-danger-subtle rounded-4 d-none fade-section mb-4">
+              <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-info-circle-fill text-danger fs-3"></i>
+                <div>
+                  <h6 class="fw-bold text-danger mb-1">รับทราบข้อมูลการไม่เข้าร่วมงาน</h6>
+                  <p class="mb-0 small text-muted">ท่านสามารถกดปุ่ม <strong>"ส่งข้อมูลแบบสำรวจ"</strong> ด้านล่างเพื่อบันทึกข้อมูลได้ทันที</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- เงื่อนไขกรณีเลือก "ไป" -->
+            <div id="goingDetailsSection" class="d-none fade-section">
+              <hr class="my-4 opacity-25">
+
+              <!-- เลือกรูปแบบกิจกรรมของผู้ลงทะเบียนหลัก -->
+              <div class="mb-4">
+                <div class="section-title mb-3">
+                  <span class="section-icon" style="background: linear-gradient(135deg, #00B4DB, #0083B0);">
+                    <i class="bi bi-stars"></i>
+                  </span>
+                  <span>เลือกรูปแบบกิจกรรม (สำหรับผู้ลงทะเบียน) <span class="text-danger">*</span></span>
+                </div>
+
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <input type="radio" class="btn-check" name="mainActivity" id="actDining" value="ร่วมรับประทานอาหาร">
+                    <label class="choice-card activity-card flex-column text-center p-3" for="actDining">
+                      <div class="choice-icon bg-warning bg-opacity-25 text-warning mx-auto">
+                        <i class="bi bi-cup-hot-fill"></i>
+                      </div>
+                      <div class="fw-semibold">ร่วมรับประทานอาหาร</div>
+                    </label>
+                  </div>
+
+                  <div class="col-md-4">
+                    <input type="radio" class="btn-check" name="mainActivity" id="actSkywalk" value="ขึ้นตึกมหานคร">
+                    <label class="choice-card activity-card flex-column text-center p-3" for="actSkywalk">
+                      <div class="choice-icon bg-info bg-opacity-25 text-info mx-auto">
+                        <i class="bi bi-building-up"></i>
+                      </div>
+                      <div class="fw-semibold">ขึ้นตึกมหานคร</div>
+                    </label>
+                  </div>
+
+                  <div class="col-md-4">
+                    <input type="radio" class="btn-check" name="mainActivity" id="actBoth" value="ร่วมรับประทานอาหารพร้อมขึ้นตึกมหานคร">
+                    <label class="choice-card activity-card flex-column text-center p-3" for="actBoth">
+                      <div class="choice-icon bg-primary bg-opacity-10 text-primary mx-auto">
+                        <i class="bi bi-gem"></i>
+                      </div>
+                      <div class="fw-semibold">ร่วมรับประทานอาหารพร้อมขึ้นตึกมหานคร</div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- เลือกจำนวนผู้ติดตาม (สูงสุด 5 คน) -->
+              <div class="mb-4">
+                <div class="section-title mb-3">
+                  <span class="section-icon" style="background: linear-gradient(135deg, #10B981, #059669);">
+                    <i class="bi bi-people-fill"></i>
+                  </span>
+                  <span>จำนวนผู้ติดตาม (สูงสุด 5 คน)</span>
+                </div>
+
+                <select class="form-select form-select-lg fw-semibold" id="companionCount">
+                  <option value="0" selected>0 คน (เดินทางคนเดียว ไม่มีผู้ติดตาม)</option>
+                  <option value="1">1 คน</option>
+                  <option value="2">2 คน</option>
+                  <option value="3">3 คน</option>
+                  <option value="4">4 คน</option>
+                  <option value="5">5 คน</option>
+                </select>
+              </div>
+
+              <!-- กล่องกรอกข้อมูลผู้ติดตามแบบ Dynamic -->
+              <div id="companionsContainer" class="d-flex flex-column gap-3 mb-4"></div>
+            </div>
+
+            <!-- ปุ่มส่งข้อมูล -->
+            <div class="d-grid mt-4">
+              <button type="submit" class="btn btn-submit-vibrant" id="submitBtn">
+                <i class="bi bi-send-check-fill me-2"></i> ส่งข้อมูลแบบสำรวจ
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer พร้อมปุ่มเข้าสู่หน้า Admin -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 text-center text-sm-start">
+        <div>
+          <div class="fw-semibold text-dark small">
+            <i class="bi bi-building me-1 text-primary"></i> King Power Mahanakhon Special Event 2026
+          </div>
+          <small class="text-muted">ระบบแบบสำรวจการเข้าร่วมกิจกรรมออนไลน์</small>
+        </div>
+
+        <div>
+          <a href="admin.html" class="text-decoration-none btn-admin-footer">
+            <i class="bi bi-shield-lock-fill"></i> Admin
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // =========================================================================
+    // [สำคัญ] นำ URL ของ Google Apps Script Web App มาวางแทนที่ข้อความด้านล่างนี้
+    // =========================================================================
+    const GAS_API_URL = 'นhttps://script.google.com/macros/s/AKfycbwSxlV99hhGKkdJ9MASb5zeGGNus4p5YQBHKBbNw3MnSeKlpRsqUrsiGSHT88CMUeW9jQ/exec';
+
+    const optGoing = document.getElementById('optGoing');
+    const optNotGoing = document.getElementById('optNotGoing');
+    const goingDetailsSection = document.getElementById('goingDetailsSection');
+    const notGoingNotice = document.getElementById('notGoingNotice');
+    const companionCountSelect = document.getElementById('companionCount');
+    const companionsContainer = document.getElementById('companionsContainer');
+    const surveyForm = document.getElementById('surveyForm');
+
+    function handleAttendanceChange() {
+      if (optGoing.checked) {
+        goingDetailsSection.classList.remove('d-none');
+        notGoingNotice.classList.add('d-none');
+      } else if (optNotGoing.checked) {
+        goingDetailsSection.classList.add('d-none');
+        notGoingNotice.classList.remove('d-none');
+      }
+    }
+
+    optGoing.addEventListener('change', handleAttendanceChange);
+    optNotGoing.addEventListener('change', handleAttendanceChange);
+
+    // สร้างฟอร์มผู้ติดตามตามจำนวนที่เลือก (1 - 5 คน)
+    companionCountSelect.addEventListener('change', function () {
+      const targetCount = parseInt(this.value, 10);
+      const existingCards = companionsContainer.querySelectorAll('.companion-card');
+      const currentCount = existingCards.length;
+
+      if (targetCount < currentCount) {
+        for (let i = currentCount - 1; i >= targetCount; i--) {
+          existingCards[i].remove();
+        }
+        return;
+      }
+
+      const selectedMainAct = document.querySelector('input[name="mainActivity"]:checked');
+      const defaultAct = selectedMainAct ? selectedMainAct.value : '';
+
+      for (let i = currentCount + 1; i <= targetCount; i++) {
+        const cardHtml = `
+          <div class="companion-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="companion-badge"><i class="bi bi-person-heart me-1"></i> ผู้ติดตามคนที่ ${i}</span>
+            </div>
+            <div class="row g-3">
+              <div class="col-md-5">
+                <label class="form-label fw-semibold small">ชื่อ-นามสกุล ผู้ติดตามคนที่ ${i} <span class="text-danger">*</span></label>
+                <input type="text" class="form-control companion-name" placeholder="กรอกชื่อ-นามสกุล" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold small">ความสัมพันธ์ <span class="text-danger">*</span></label>
+                <select class="form-select companion-relation" required>
+                  <option value="" selected disabled>-- เลือก --</option>
+                  <option value="สามี">สามี</option>
+                  <option value="ภรรยา">ภรรยา</option>
+                  <option value="ลูก">ลูก</option>
+                  <option value="ญาติ">ญาติ</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold small">กิจกรรมที่เข้าร่วม <span class="text-danger">*</span></label>
+                <select class="form-select companion-activity" required>
+                  <option value="" ${defaultAct === '' ? 'selected' : ''} disabled>-- เลือกกิจกรรม --</option>
+                  <option value="ร่วมรับประทานอาหาร" ${defaultAct === 'ร่วมรับประทานอาหาร' ? 'selected' : ''}>ร่วมรับประทานอาหาร</option>
+                  <option value="ขึ้นตึกมหานคร" ${defaultAct === 'ขึ้นตึกมหานคร' ? 'selected' : ''}>ขึ้นตึกมหานคร</option>
+                  <option value="ร่วมรับประทานอาหารพร้อมขึ้นตึกมหานคร" ${defaultAct === 'ร่วมรับประทานอาหารพร้อมขึ้นตึกมหานคร' ? 'selected' : ''}>ร่วมรับประทานอาหารพร้อมขึ้นตึกมหานคร</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        `;
+        companionsContainer.insertAdjacentHTML('beforeend', cardHtml);
+      }
+    });
+
+    // ส่งข้อมูลไปยัง Google Apps Script API ผ่าน fetch()
+    surveyForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      if (!GAS_API_URL || GAS_API_URL.includes('นำ_WEB_APP_URL')) {
+        Swal.fire({
+          icon: 'error',
+          title: 'ยังไม่ได้ตั้งค่า URL เชื่อมต่อ',
+          text: 'กรุณาใส่ Google Apps Script Web App URL ในตัวแปร GAS_API_URL ก่อนใช้งาน'
+        });
+        return;
+      }
+
+      const fullName = document.getElementById('fullName').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const attendanceEl = document.querySelector('input[name="attendance"]:checked');
+
+      if (!fullName) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'กรุณากรอกชื่อ-นามสกุล',
+          text: 'โปรดระบุชื่อ-นามสกุลของผู้ลงทะเบียนก่อนส่งข้อมูล',
+          confirmButtonColor: '#6C5CE7'
+        });
+        return;
+      }
+
+      if (!attendanceEl) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'กรุณาเลือกสถานะการเข้าร่วม',
+          text: 'โปรดเลือกว่าท่านจะ "ไป" หรือ "ไม่ไป"',
+          confirmButtonColor: '#6C5CE7'
+        });
+        return;
+      }
+
+      const attendance = attendanceEl.value;
+      let mainActivity = '';
+      let companionCount = 0;
+      const companions = [];
+
+      if (attendance === 'ไป') {
+        const mainActEl = document.querySelector('input[name="mainActivity"]:checked');
+        if (!mainActEl) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'กรุณาเลือกกิจกรรม',
+            text: 'โปรดเลือกรูปแบบกิจกรรมสำหรับผู้ลงทะเบียน',
+            confirmButtonColor: '#6C5CE7'
+          });
+          return;
+        }
+        mainActivity = mainActEl.value;
+        companionCount = parseInt(companionCountSelect.value, 10);
+
+        const companionCards = document.querySelectorAll('.companion-card');
+        for (let i = 0; i < companionCards.length; i++) {
+          const card = companionCards[i];
+          const cName = card.querySelector('.companion-name').value.trim();
+          const cRelation = card.querySelector('.companion-relation').value;
+          const cActivity = card.querySelector('.companion-activity').value;
+
+          if (!cName || !cRelation || !cActivity) {
+            Swal.fire({
+              icon: 'warning',
+              title: `ข้อมูลผู้ติดตามคนที่ ${i + 1} ไม่ครบถ้วน`,
+              text: 'กรุณากรอกชื่อ-นามสกุล เลือกความสัมพันธ์ และเลือกกิจกรรมให้ครบถ้วน',
+              confirmButtonColor: '#6C5CE7'
+            });
+            return;
+          }
+
+          companions.push({
+            name: cName,
+            relation: cRelation,
+            activity: cActivity
+          });
+        }
+      }
+
+      const payload = {
+        fullName,
+        phone,
+        attendance,
+        mainActivity,
+        companionCount,
+        companions
+      };
+
+      Swal.fire({
+        title: 'กำลังบันทึกข้อมูล...',
+        text: 'กรุณารอสักครู่ ระบบกำลังส่งข้อมูลไปยัง Google Sheets',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      try {
+        const response = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify({
+            action: 'saveSurvey',
+            payload: payload
+          })
+        });
+
+        const res = await response.json();
+
+        if (res.status === 'success') {
+          Swal.fire({
+            icon: 'success',
+            title: 'บันทึกสำเร็จ!',
+            html: attendance === 'ไป'
+              ? `ขอบคุณคุณ <b>${fullName}</b><br>ลงทะเบียนเข้าร่วมกิจกรรมเรียบร้อยแล้ว (ผู้ติดตาม ${companionCount} คน)`
+              : `ขอบคุณคุณ <b>${fullName}</b><br>ระบบบันทึกการแจ้งไม่เข้าร่วมงานเรียบร้อยแล้ว`,
+            confirmButtonText: 'ตกลง',
+            confirmButtonColor: '#10B981'
+          }).then(() => {
+            surveyForm.reset();
+            goingDetailsSection.classList.add('d-none');
+            notGoingNotice.classList.add('d-none');
+            companionsContainer.innerHTML = '';
+          });
+        } else {
+          throw new Error(res.message || 'ไม่สามารถบันทึกข้อมูลได้');
+        }
+      } catch (err) {
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: err.message || 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง',
+          confirmButtonColor: '#FF6B6B'
+        });
+      }
+    });
+  </script>
+</body>
+</html>
