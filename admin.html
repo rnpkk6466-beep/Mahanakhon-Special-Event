@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | King Power Mahanakhon</title>
+
+  <!-- Google Fonts: Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3 & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- SweetAlert2 & Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --primary-coral: #FF6B6B;
+      --secondary-teal: #4ECDC4;
+      --accent-yellow: #FFD166;
+      --vivid-purple: #6C5CE7;
+    }
+
+    body {
+      font-family: 'Prompt', sans-serif;
+      background: linear-gradient(135deg, #F5F3FF 0%, #F0F9FF 50%, #FFF5F5 100%);
+      color: #1E293B;
+      min-height: 100vh;
+    }
+
+    /* Login Card */
+    .login-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 1.75rem;
+      box-shadow: 0 20px 50px rgba(108, 92, 231, 0.16);
+      padding: 2.5rem 2rem;
+      max-width: 420px;
+      width: 100%;
+      border: 2px solid #FFFFFF;
+    }
+
+    .login-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #FF6B6B, #6C5CE7);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 1.25rem;
+      box-shadow: 0 10px 25px rgba(108, 92, 231, 0.35);
+    }
+
+    /* Admin Navbar */
+    .admin-navbar {
+      background: linear-gradient(90deg, #6C5CE7 0%, #8E44AD 50%, #FF6B6B 100%);
+      color: white;
+      padding: 1rem 0;
+      box-shadow: 0 6px 25px rgba(108, 92, 231, 0.25);
+    }
+
+    /* KPI Cards */
+    .kpi-card {
+      border: none;
+      border-radius: 1.35rem;
+      padding: 1.35rem;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      transition: transform 0.25s ease;
+      height: 100%;
+    }
+
+    .kpi-card:hover { transform: translateY(-4px); }
+
+    .kpi-purple { background: linear-gradient(135deg, #6C5CE7, #A29BFE); }
+    .kpi-green  { background: linear-gradient(135deg, #059669, #34D399); }
+    .kpi-red    { background: linear-gradient(135deg, #E11D48, #FB7185); }
+    .kpi-orange { background: linear-gradient(135deg, #F59E0B, #FBBF24); color: #1E293B; }
+    .kpi-coral  { background: linear-gradient(135deg, #FF6B6B, #FF8E53); }
+
+    .kpi-bg-icon {
+      position: absolute;
+      right: -10px;
+      bottom: -15px;
+      font-size: 4.5rem;
+      opacity: 0.18;
+    }
+
+    /* Glass Panel */
+    .panel-card {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 1.5rem;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      box-shadow: 0 12px 35px rgba(15, 23, 42, 0.05);
+      padding: 1.5rem;
+    }
+
+    .btn-vibrant {
+      background: linear-gradient(90deg, #FF6B6B, #6C5CE7);
+      border: none;
+      color: white;
+      font-weight: 600;
+      border-radius: 50px;
+      padding: 0.65rem 1.5rem;
+      transition: all 0.25s ease;
+    }
+
+    .btn-vibrant:hover {
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(108, 92, 231, 0.35);
+    }
+
+    /* Table Styling */
+    .table thead th {
+      background-color: #F8FAFC;
+      color: #475569;
+      font-weight: 600;
+      border-bottom: 2px solid #E2E8F0;
+      white-space: nowrap;
+    }
+
+    .companion-pill {
+      display: inline-block;
+      background: #F0FDFA;
+      border: 1px solid #99F6E4;
+      color: #0F766E;
+      border-radius: 8px;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .activity-stat-box {
+      border-radius: 1rem;
+      padding: 1rem;
+      border: 1.5px solid #E2E8F0;
+      background: #FFFFFF;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ส่วนที่ 1: หน้า Login สำหรับ Admin -->
+  <div id="loginSection" class="login-wrapper">
+    <div class="login-card text-center">
+      <div class="login-icon">
+        <i class="bi bi-shield-lock-fill"></i>
+      </div>
+      <h4 class="fw-bold mb-1">เข้าสู่ระบบผู้ดูแล (Admin)</h4>
+      <p class="text-muted small mb-4">แบบสำรวจกิจกรรม King Power Mahanakhon</p>
+
+      <form id="loginForm">
+        <div class="input-group mb-3">
+          <span class="input-group-text bg-light border-end-0 rounded-start-4">
+            <i class="bi bi-key-fill text-primary"></i>
+          </span>
+          <input type="password" id="adminPasswordInput" class="form-control border-start-0 border-end-0" placeholder="กรอกรหัสผ่าน Admin" required>
+          <button class="btn btn-light border border-start-0 rounded-end-4" type="button" id="togglePwdBtn">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>
+
+        <div class="d-grid mb-3">
+          <button type="submit" class="btn btn-vibrant py-2 fs-6">
+            <i class="bi bi-box-arrow-in-right me-1"></i> เข้าสู่ระบบจัดการข้อมูล
+          </button>
+        </div>
+
+        <a href="index.html" class="text-decoration-none small text-muted">
+          <i class="bi bi-arrow-left me-1"></i> กลับไปยังหน้าแบบสำรวจ
+        </a>
+      </form>
+    </div>
+  </div>
+
+  <!-- ส่วนที่ 2: หน้า Dashboard หลัก -->
+  <div id="dashboardSection" class="d-none pb-5">
+    <!-- Top Navbar -->
+    <nav class="admin-navbar mb-4">
+      <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-speedometer2 fs-3"></i>
+          <div>
+            <h5 class="fw-bold mb-0">Admin Dashboard</h5>
+            <small class="opacity-75">ระบบสรุปผลและจัดการข้อมูลแบบสำรวจตึกมหานคร</small>
+          </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-light btn-sm rounded-pill fw-semibold px-3" onclick="loadDashboardData()">
+            <i class="bi bi-arrow-clockwise me-1"></i> รีเฟรช
+          </button>
+          <a id="openSheetBtn" href="#" target="_blank" class="btn btn-warning btn-sm rounded-pill fw-semibold px-3">
+            <i class="bi bi-file-earmark-spreadsheet-fill me-1"></i> Google Sheets
+          </a>
+          <a href="index.html" class="btn btn-outline-light btn-sm rounded-pill px-3">
+            <i class="bi bi-ui-checks me-1"></i> หน้าแบบสำรวจ
+          </a>
+          <button class="btn btn-dark btn-sm rounded-pill px-3" onclick="logoutAdmin()">
+            <i class="bi bi-box-arrow-right me-1"></i> ออก
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <!-- KPI Summary Row (ครบทั้ง 5 การ์ด) -->
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-5 g-3 mb-4">
+        <div class="col">
+          <div class="kpi-card kpi-purple">
+            <div class="small opacity-90 mb-1">ผู้ตอบแบบสำรวจทั้งหมด</div>
+            <h2 class="fw-bold mb-0" id="statTotalResponses">0</h2>
+            <small class="opacity-75">รายการลงทะเบียน</small>
+            <i class="bi bi-clipboard-data kpi-bg-icon"></i>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="kpi-card kpi-green">
+            <div class="small opacity-90 mb-1">ยืนยันเข้าร่วม "ไป"</div>
+            <h2 class="fw-bold mb-0" id="statGoingCount">0</h2>
+            <small class="opacity-75">ผู้ลงทะเบียนหลัก</small>
+            <i class="bi bi-person-check-fill kpi-bg-icon"></i>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="kpi-card kpi-red">
+            <div class="small opacity-90 mb-1">ยืนยันไม่เข้าร่วม</div>
+            <h2 class="fw-bold mb-0" id="statNotGoingCount">0</h2>
+            <small class="opacity-75">ไม่สะดวกเข้าร่วมงาน</small>
+            <i class="bi bi-person-x-fill kpi-bg-icon"></i>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="kpi-card kpi-orange">
+            <div class="small opacity-90 mb-1">จำนวนผู้ติดตามรวม</div>
+            <h2 class="fw-bold mb-0" id="statTotalCompanions">0</h2>
+            <small class="opacity-75">ครอบครัว / ญาติ</small>
+            <i class="bi bi-people-fill kpi-bg-icon"></i>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="kpi-card kpi-coral">
+            <div class="small opacity-90 mb-1">ยอดผู้เข้าร่วมงานสุทธิ</div>
+            <h2 class="fw-bold mb-0" id="statGrandTotal">0</h2>
+            <small class="opacity-75">ผู้ลงทะเบียน + ผู้ติดตาม</small>
+            <i class="bi bi-stars kpi-bg-icon"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Breakdown & Chart Row -->
+      <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+          <div class="panel-card h-100">
+            <h6 class="fw-bold text-primary mb-3">
+              <i class="bi bi-bar-chart-steps me-1"></i> สรุปยอดจำนวนคนแยกตามกิจกรรม (รวมผู้ลงทะเบียน + ผู้ติดตาม)
+            </h6>
+            <div class="d-flex flex-column gap-3">
+              <div class="activity-stat-box d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="rounded-3 bg-warning bg-opacity-25 text-warning p-2 fs-4">
+                    <i class="bi bi-cup-hot-fill"></i>
+                  </div>
+                  <div>
+                    <div class="fw-bold">ร่วมรับประทานอาหาร</div>
+                    <small class="text-muted">เฉพาะรับประทานอาหาร</small>
+                  </div>
+                </div>
+                <span class="badge bg-warning text-dark fs-6 rounded-pill px-3 py-2" id="actDiningCount">0 คน</span>
+              </div>
+
+              <div class="activity-stat-box d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="rounded-3 bg-info bg-opacity-25 text-info p-2 fs-4">
+                    <i class="bi bi-building-up"></i>
+                  </div>
+                  <div>
+                    <div class="fw-bold">ขึ้นตึกมหานคร</div>
+                    <small class="text-muted">เฉพาะขึ้นชมวิว SkyWalk</small>
+                  </div>
+                </div>
+                <span class="badge bg-info text-dark fs-6 rounded-pill px-3 py-2" id="actSkywalkCount">0 คน</span>
+              </div>
+
+              <div class="activity-stat-box d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="rounded-3 bg-primary bg-opacity-10 text-primary p-2 fs-4">
+                    <i class="bi bi-gem"></i>
+                  </div>
+                  <div>
+                    <div class="fw-bold">ร่วมรับประทานอาหารพร้อมขึ้นตึกมหานคร</div>
+                    <small class="text-muted">เข้าร่วมทั้ง 2 กิจกรรม</small>
+                  </div>
+                </div>
+                <span class="badge bg-primary fs-6 rounded-pill px-3 py-2" id="actBothCount">0 คน</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="panel-card h-100 d-flex flex-column justify-content-center align-items-center">
+            <h6 class="fw-bold text-primary mb-3 w-100">
+              <i class="bi bi-pie-chart-fill me-1"></i> สัดส่วนผู้เลือกแต่ละกิจกรรม
+            </h6>
+            <div style="max-width: 240px; width: 100%;">
+              <canvas id="activityChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Table Section -->
+      <div class="panel-card">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+          <h6 class="fw-bold text-dark mb-0">
+            <i class="bi bi-table me-1 text-primary"></i> รายชื่อผู้ตอบแบบสำรวจทั้งหมด (<span id="filteredCountLabel">0</span> รายการ)
+          </h6>
+
+          <div class="d-flex flex-wrap gap-2">
+            <input type="text" id="searchInput" class="form-control form-control-sm rounded-pill px-3" style="width: 220px;" placeholder="ค้นหาชื่อ, เบอร์โทร, ผู้ติดตาม...">
+
+            <select id="statusFilter" class="form-select form-select-sm rounded-pill px-3" style="width: 150px;">
+              <option value="ALL">สถานะ: ทั้งหมด</option>
+              <option value="ไป">เฉพาะ: ไป</option>
+              <option value="ไม่ไป">เฉพาะ: ไม่ไป</option>
+            </select>
+
+            <button class="btn btn-success btn-sm rounded-pill px-3 fw-semibold" onclick="exportToCSV()">
+              <i class="bi bi-download me-1"></i> Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>วัน-เวลาที่บันทึก</th>
+                <th>ผู้ลงทะเบียน</th>
+                <th>สถานะ</th>
+                <th>กิจกรรมหลัก</th>
+                <th>ผู้ติดตาม</th>
+                <th class="text-center">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="recordsTableBody">
+              <tr>
+                <td colspan="7" class="text-center text-muted py-4">กำลังโหลดข้อมูล...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // [สำคัญ] นำ URL ของ Google Apps Script Web App มาวางแทนที่ข้อความด้านล่างนี้
+    // =========================================================================
+    const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwSxlV99hhGKkdJ9MASb5zeGGNus4p5YQBHKBbNw3MnSeKlpRsqUrsiGSHT88CMUeW9jQ/exec';
+
+    let allRecords = [];
+    let filteredRecords = [];
+    let activityChartInstance = null;
+
+    const loginSection = document.getElementById('loginSection');
+    const dashboardSection = document.getElementById('dashboardSection');
+    const loginForm = document.getElementById('loginForm');
+    const adminPasswordInput = document.getElementById('adminPasswordInput');
+    const togglePwdBtn = document.getElementById('togglePwdBtn');
+
+    togglePwdBtn.addEventListener('click', () => {
+      const isPwd = adminPasswordInput.type === 'password';
+      adminPasswordInput.type = isPwd ? 'text' : 'password';
+      togglePwdBtn.innerHTML = isPwd ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedPwd = sessionStorage.getItem('mahanakhon_admin_pwd');
+      if (savedPwd) {
+        loadDashboardData(savedPwd, true);
+      }
+    });
+
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const pwd = adminPasswordInput.value.trim();
+      if (!pwd) return;
+      loadDashboardData(pwd, false);
+    });
+
+    // ดึงข้อมูลจาก Google Apps Script API ผ่าน fetch()
+    async function loadDashboardData(passwordOverride, isSilent) {
+      if (!GAS_API_URL || GAS_API_URL.includes('นำ_WEB_APP_URL')) {
+        Swal.fire({
+          icon: 'error',
+          title: 'ยังไม่ได้ตั้งค่า URL เชื่อมต่อ',
+          text: 'กรุณาใส่ Google Apps Script Web App URL ในตัวแปร GAS_API_URL ก่อนใช้งาน'
+        });
+        return;
+      }
+
+      const pwd = passwordOverride || sessionStorage.getItem('mahanakhon_admin_pwd');
+      if (!pwd) return;
+
+      if (!isSilent) {
+        Swal.fire({
+          title: 'กำลังตรวจสอบสิทธิ์และโหลดข้อมูล...',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading()
+        });
+      }
+
+      try {
+        const response = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify({
+            action: 'getAdminData',
+            password: pwd
+          })
+        });
+
+        const res = await response.json();
+
+        if (res.status === 'success') {
+          Swal.close();
+          sessionStorage.setItem('mahanakhon_admin_pwd', pwd);
+          loginSection.classList.add('d-none');
+          dashboardSection.classList.remove('d-none');
+
+          if (res.sheetUrl) document.getElementById('openSheetBtn').href = res.sheetUrl;
+
+          renderKPIs(res.stats);
+          renderChart(res.stats.activities);
+
+          allRecords = res.records || [];
+          applyFilters();
+        } else {
+          throw new Error(res.message || 'รหัสผ่านไม่ถูกต้อง');
+        }
+      } catch (err) {
+        sessionStorage.removeItem('mahanakhon_admin_pwd');
+        Swal.fire({
+          icon: 'error',
+          title: 'เข้าสู่ระบบไม่สำเร็จ',
+          text: err.message || 'รหัสผ่านไม่ถูกต้องหรือเชื่อมต่อ API ไม่ได้',
+          confirmButtonColor: '#FF6B6B'
+        });
+      }
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem('mahanakhon_admin_pwd');
+      adminPasswordInput.value = '';
+      dashboardSection.classList.add('d-none');
+      loginSection.classList.remove('d-none');
+    }
+
+    function renderKPIs(stats) {
+      document.getElementById('statTotalResponses').textContent = stats.totalResponses;
+      document.getElementById('statGoingCount').textContent = stats.goingCount;
+      document.getElementById('statNotGoingCount').textContent = stats.notGoingCount;
+      document.getElementById('statTotalCompanions').textContent = stats.totalCompanions;
+      document.getElementById('statGrandTotal').textContent = stats.grandTotalAttendees;
+
+      document.getElementById('actDiningCount').textContent = `${stats.activities.dining} คน`;
+      document.getElementById('actSkywalkCount').textContent = `${stats.activities.skywalk} คน`;
+      document.getElementById('actBothCount').textContent = `${stats.activities.both} คน`;
+    }
+
+    function renderChart(activities) {
+      const ctx = document.getElementById('activityChart').getContext('2d');
+      if (activityChartInstance) {
+        activityChartInstance.destroy();
+      }
+
+      const dataValues = [activities.dining, activities.skywalk, activities.both];
+      const hasData = dataValues.some(v => v > 0);
+
+      activityChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['รับประทานอาหาร', 'ขึ้นตึกมหานคร', 'อาหาร + ขึ้นตึก'],
+          datasets: [{
+            data: hasData ? dataValues : [1],
+            backgroundColor: hasData ? ['#FFD166', '#4ECDC4', '#6C5CE7'] : ['#E2E8F0'],
+            borderWidth: 2,
+            borderColor: '#FFFFFF'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                font: { family: 'Prompt', size: 12 }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('statusFilter').addEventListener('change', applyFilters);
+
+    function applyFilters() {
+      const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+
+      filteredRecords = allRecords.filter(item => {
+        const matchStatus = (status === 'ALL') || (item.attendance === status);
+        const matchKeyword = !keyword ||
+          item.fullName.toLowerCase().includes(keyword) ||
+          item.phone.toLowerCase().includes(keyword) ||
+          item.companions.some(c => c.toLowerCase().includes(keyword));
+        return matchStatus && matchKeyword;
+      });
+
+      document.getElementById('filteredCountLabel').textContent = filteredRecords.length;
+      renderTable(filteredRecords);
+    }
+
+    function renderTable(records) {
+      const tbody = document.getElementById('recordsTableBody');
+      if (records.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">ไม่พบข้อมูลรายการ</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = records.map((rec, idx) => {
+        const isGoing = rec.attendance === 'ไป';
+        const statusBadge = isGoing
+          ? `<span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-3">ไป</span>`
+          : `<span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle rounded-pill px-3">ไม่ไป</span>`;
+
+        let companionHtml = '<span class="text-muted small">-</span>';
+        if (isGoing && rec.companionCount > 0) {
+          const pills = rec.companions.map(c => `<div class="companion-pill">${escapeHtml(c)}</div>`).join('');
+          companionHtml = `<div class="fw-semibold small text-dark mb-1">รวม ${rec.companionCount} คน:</div>${pills}`;
+        } else if (isGoing) {
+          companionHtml = '<span class="text-muted small">0 คน (คนเดียว)</span>';
+        }
+
+        return `
+          <tr>
+            <td class="text-muted small">${idx + 1}</td>
+            <td class="small text-nowrap">${escapeHtml(rec.timestamp)}</td>
+            <td>
+              <div class="fw-semibold">${escapeHtml(rec.fullName)}</div>
+              <small class="text-muted"><i class="bi bi-telephone me-1"></i>${escapeHtml(rec.phone)}</small>
+            </td>
+            <td>${statusBadge}</td>
+            <td class="small">${escapeHtml(rec.mainActivity)}</td>
+            <td>${companionHtml}</td>
+            <td class="text-center">
+              <button class="btn btn-outline-danger btn-sm rounded-pill" onclick="confirmDelete(${rec.rowNumber}, '${escapeHtml(rec.fullName)}')" title="ลบรายการ">
+                <i class="bi bi-trash3"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function confirmDelete(rowNumber, fullName) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'ยืนยันการลบข้อมูล?',
+        html: `ต้องการลบข้อมูลของ <b>${fullName}</b> ออกจาก Google Sheets ใช่หรือไม่?`,
+        showCancelButton: true,
+        confirmButtonText: 'ใช่, ลบข้อมูล',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#EF4444',
+        cancelButtonColor: '#64748B'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const pwd = sessionStorage.getItem('mahanakhon_admin_pwd');
+          Swal.fire({
+            title: 'กำลังลบข้อมูล...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+          });
+
+          try {
+            const response = await fetch(GAS_API_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'text/plain;charset=utf-8'
+              },
+              body: JSON.stringify({
+                action: 'deleteRow',
+                password: pwd,
+                rowNumber: rowNumber
+              })
+            });
+
+            const res = await response.json();
+
+            if (res.status === 'success') {
+              Swal.fire({
+                icon: 'success',
+                title: 'ลบข้อมูลสำเร็จ',
+                timer: 1500,
+                showConfirmButton: false
+              });
+              loadDashboardData(pwd, true);
+            } else {
+              throw new Error(res.message || 'ลบข้อมูลไม่สำเร็จ');
+            }
+          } catch (err) {
+            Swal.fire({
+              icon: 'error',
+              title: 'เกิดข้อผิดพลาด',
+              text: err.message
+            });
+          }
+        }
+      });
+    }
+
+    function exportToCSV() {
+      if (filteredRecords.length === 0) {
+        Swal.fire({ icon: 'info', title: 'ไม่มีข้อมูลสำหรับส่งออก' });
+        return;
+      }
+
+      const headers = ['วัน-เวลาที่บันทึก', 'ชื่อ-นามสกุล', 'เบอร์โทรศัพท์', 'สถานะ', 'กิจกรรมหลัก', 'จำนวนผู้ติดตาม', 'รายละเอียดผู้ติดตาม'];
+      const rows = filteredRecords.map(r => [
+        `"${r.timestamp}"`,
+        `"${r.fullName.replace(/"/g, '""')}"`,
+        `"${r.phone}"`,
+        `"${r.attendance}"`,
+        `"${r.mainActivity}"`,
+        r.companionCount,
+        `"${r.companions.join(' | ').replace(/"/g, '""')}"`
+      ]);
+
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Mahanakhon_Survey_${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
